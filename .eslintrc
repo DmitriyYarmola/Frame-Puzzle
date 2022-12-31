@@ -1,0 +1,108 @@
+{
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "prettier",
+    "import"
+  ],
+  "rules": {
+    "prettier/prettier": "warn",
+    "no-useless-escape": "off",
+    "jsx-a11y/anchor-has-content": "off",
+    "jsx-a11y/href-no-hash": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "unicorn/no-unreadable-array-destructuring": "off",
+    "react/prop-types": 0,
+    "react/prefer-stateless-function": 0,
+    "react/jsx-one-expression-per-line": 0,
+    "linebreak-style": 0,
+    "react/jsx-wrap-multilines": 0,
+    "no-console": 0,
+    "react/no-multi-comp": 0,
+    "no-magic-numbers": "warn",
+//    "react/jsx-curly-brace-presence": 1,
+    "arrow-body-style": ["warn", "as-needed"],
+    "import/order": [
+      "warn",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+        "pathGroups": [
+          {
+            "pattern": "~/",
+            "group": "external"
+          },
+          {
+            "pattern": "@",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@/",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@app",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@app/",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@pages",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@pages/",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@features",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@features/",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@entities",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@entities/",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@shared",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@shared/",
+            "group": "internal",
+            "position": "before"
+          }
+
+        ]
+      }
+    ]
+  },
+  "settings": {
+    "import/parsers": {
+      "typescript": {
+        "alwaysTryTypes": true
+      },
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    }
+  }
+}

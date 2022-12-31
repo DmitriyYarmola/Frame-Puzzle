@@ -1,10 +1,5 @@
-import './index.css'
+import "./index.css";
 
 export function App() {
-
-    return (
-        <div className="text-3xl font-bold underline">
-            React app
-        </div>
-    )
+  return <div className="text-3xl font-bold underline">React app</div>;
 }
