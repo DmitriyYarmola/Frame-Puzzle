@@ -36,7 +36,7 @@ export const ScramblePuzzle = () => {
 
   return (
     <canvas
-      className="mx-auto"
+      className="mx-auto active:cursor-pointer"
       ref={(ref) => canvasModel.canvasAPI.set(ref)}
       onMouseDown={onMouseEvent("down")}
       onMouseMove={onMouseEvent("move")}
