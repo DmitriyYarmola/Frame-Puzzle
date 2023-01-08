@@ -1,5 +1,5 @@
-import { createEvent, sample } from "effector";
-import { $canvas } from "@entities/canvas/model/stores";
+import { createEvent } from "effector";
+import { $canvas } from "./stores";
 
 export const saveWorkingCanvas = createEvent<HTMLCanvasElement | null>();
 
