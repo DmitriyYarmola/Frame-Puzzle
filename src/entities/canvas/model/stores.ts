@@ -3,7 +3,7 @@ import { createApi, createStore } from "effector";
 export const $canvas = createStore<HTMLCanvasElement | null>(null);
 
 export const canvasAPI = createApi($canvas, {
-  add: (_, canvas: HTMLCanvasElement | null) => canvas,
+  set: (_, canvas: HTMLCanvasElement | null) => canvas,
   clear: (canvas) => {
     if (!canvas) return null;
 
