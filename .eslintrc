@@ -21,8 +21,9 @@
     "no-console": 0,
     "react/no-multi-comp": 0,
     "no-magic-numbers": "warn",
-//    "react/jsx-curly-brace-presence": 1,
     "arrow-body-style": ["warn", "as-needed"],
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".ts", ".tsx"] }],
     "import/order": [
       "warn",
       {
