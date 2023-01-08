@@ -1,4 +1,4 @@
-import { createEvent, sample } from "effector";
+import { createEvent, forward, sample } from "effector";
 import {
   canvasModel,
   transformCanvasCoordinatesToRelativeCoordinates,
@@ -10,6 +10,8 @@ import {
 import { Coordinates } from "@shared/interfaces";
 
 export const generatePuzzles = createEvent();
+
+export const redrawPuzzles = createEvent();
 
 sample({
   clock: generatePuzzles,
@@ -43,17 +45,54 @@ sample({
   target: puzzleModel.$puzzles,
 });
 
+forward({
+  from: puzzleModel.$puzzles,
+  to: redrawPuzzles,
+});
+
 sample({
-  clock: puzzleModel.$puzzles,
+  clock: redrawPuzzles,
   source: {
-    settings: gameSettingsModel.$gameSettings,
+    canvas: canvasModel.$canvas,
     puzzles: puzzleModel.$puzzles,
+    settings: gameSettingsModel.$gameSettings,
   },
-  fn: ({ settings: { imageInformation }, puzzles }) => ({
-    image: imageInformation,
-    puzzles,
-  }),
-  target: canvasModel.canvasAPI.draw,
+  fn: ({ canvas, puzzles, settings: { imageInformation: image } }) => {
+    if (!canvas || !image) return null;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) return null;
+
+    for (let i = 0; i < puzzles.length; i++) {
+      const puzzle = puzzles[i];
+      const { x, y, width, height, currentXPosition, currentYPosition } =
+        puzzle.getDrawInformation();
+
+      const path = new Path2D();
+
+      path.rect(currentXPosition, currentYPosition, width, height);
+
+      context.save();
+
+      context.clip(path);
+
+      context.drawImage(
+        image,
+        x,
+        y,
+        width,
+        height,
+        currentXPosition,
+        currentYPosition,
+        width,
+        height
+      );
+
+      context.restore();
+      context.stroke(path);
+    }
+  },
 });
 
 export const onGrabPuzzle = createEvent<Coordinates>();
@@ -112,7 +151,7 @@ sample({
 
     return { image: imageInformation, puzzles };
   },
-  target: canvasModel.canvasAPI.draw,
+  target: redrawPuzzles,
 });
 
 export const onDropPuzzle = createEvent();

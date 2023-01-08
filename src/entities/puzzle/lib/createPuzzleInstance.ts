@@ -25,7 +25,7 @@ export class Puzzle {
     this.height = height;
   }
 
-  draw() {
+  getDrawInformation() {
     const { x, y } = this.initialCanvasPosition;
     const { x: currentXPosition, y: currentYPosition } = this.currentCanvasPosition;
 
