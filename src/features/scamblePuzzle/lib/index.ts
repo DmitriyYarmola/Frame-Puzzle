@@ -1,1 +1,1 @@
-export * from "./drawImageProp";
+export * from "./draw";

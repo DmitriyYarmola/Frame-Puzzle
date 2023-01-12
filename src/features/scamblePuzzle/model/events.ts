@@ -6,8 +6,10 @@ import {
   Puzzle,
   puzzleModel,
   findPuzzleByCoordinates,
+  definePuzzleEdges,
 } from "@puzzleFrame/entities";
 import { Coordinates } from "@shared/interfaces";
+import { drawPuzzleSides } from "@features/scamblePuzzle/lib";
 
 export const generatePuzzles = createEvent();
 
@@ -32,10 +34,19 @@ sample({
         const canvasPositionY = row * puzzleHeight;
         order = order + 1;
 
-        const puzzle = new Puzzle(order, puzzleWidth, puzzleHeight, {
-          x: canvasPositionX,
-          y: canvasPositionY,
-        });
+        const edges = definePuzzleEdges(order, rows * cols, cols);
+
+        const puzzle = new Puzzle(
+          order,
+          puzzleWidth,
+          puzzleHeight,
+          {
+            x: canvasPositionX,
+            y: canvasPositionY,
+          },
+          edges
+        );
+
         puzzles.push(puzzle);
       }
     }
@@ -66,13 +77,15 @@ sample({
 
     for (let i = 0; i < puzzles.length; i++) {
       const puzzle = puzzles[i];
-      const { x, y, width, height, currentXPosition, currentYPosition } =
+      const { x, y, width, height, currentXPosition, currentYPosition, edges } =
         puzzle.getDrawInformation();
 
+      console.log({ edges });
       const path = new Path2D();
 
-      path.rect(currentXPosition, currentYPosition, width, height);
+      drawPuzzleSides(path, width, height, currentXPosition, currentYPosition, edges);
 
+      context.fill();
       context.save();
 
       context.clip(path);

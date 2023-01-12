@@ -1,4 +1,5 @@
 import { Coordinates } from "@shared/interfaces";
+import { PuzzleEdges } from "../interfaces";
 
 export class Puzzle {
   id: number;
@@ -7,13 +8,16 @@ export class Puzzle {
   private readonly initialCanvasPosition: Coordinates;
   private currentCanvasPosition: Coordinates;
   private puzzleClickDeviation: Coordinates;
+  private readonly edges: PuzzleEdges;
 
   constructor(
     id: number,
     width: number,
     height: number,
-    initialCanvasPosition: Coordinates
+    initialCanvasPosition: Coordinates,
+    edges: PuzzleEdges
   ) {
+    //Important: id is order number e.x: first element has id 1, the fifth element has id 5
     this.id = id;
     this.initialCanvasPosition = initialCanvasPosition;
     this.currentCanvasPosition = initialCanvasPosition;
@@ -23,6 +27,7 @@ export class Puzzle {
     };
     this.width = width;
     this.height = height;
+    this.edges = edges;
   }
 
   getDrawInformation() {
@@ -36,6 +41,7 @@ export class Puzzle {
       height: this.height,
       currentXPosition,
       currentYPosition,
+      edges: this.edges,
     };
   }
 
@@ -58,6 +64,10 @@ export class Puzzle {
       x: this.currentCanvasPosition.x,
       y: this.currentCanvasPosition.y,
     };
+  }
+
+  getEdges() {
+    return this.edges;
   }
 
   setPuzzleClickDeviation(x: number, y: number) {
