@@ -7,9 +7,10 @@ import {
   puzzleModel,
   findPuzzleByCoordinates,
   definePuzzleEdges,
+  definePuzzleSockets,
 } from "@puzzleFrame/entities";
 import { Coordinates } from "@shared/interfaces";
-import { drawPuzzleSides } from "@features/scamblePuzzle/lib";
+import { drawPuzzleSides } from "../lib";
 
 export const generatePuzzles = createEvent();
 
@@ -35,6 +36,7 @@ sample({
         order = order + 1;
 
         const edges = definePuzzleEdges(order, rows * cols, cols);
+        const sockets = definePuzzleSockets(edges, order, cols, rows);
 
         const puzzle = new Puzzle(
           order,
@@ -80,7 +82,6 @@ sample({
       const { x, y, width, height, currentXPosition, currentYPosition, edges } =
         puzzle.getDrawInformation();
 
-      console.log({ edges });
       const path = new Path2D();
 
       drawPuzzleSides(path, width, height, currentXPosition, currentYPosition, edges);

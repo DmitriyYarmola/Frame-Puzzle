@@ -21,5 +21,9 @@ export const definePuzzleEdges = (order: number, totalPuzzles: number, cols: num
     edges.push("left");
   }
 
+  if (edges.length === 0) {
+    edges.push("center");
+  }
+
   return edges;
 };

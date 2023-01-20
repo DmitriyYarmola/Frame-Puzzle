@@ -1,4 +1,6 @@
+import { log } from "util";
 import { PuzzleEdges } from "@entities/puzzle";
+import { generateSideSocket } from "@entities/puzzle/lib/generateSideSocker";
 
 const CURVE_CONTROL_POINT = 50;
 const PUZZLE_SIDE_HALF = 18;
