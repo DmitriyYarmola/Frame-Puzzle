@@ -10,6 +10,7 @@ import {
   definePuzzleSockets,
 } from "@puzzleFrame/entities";
 import { Coordinates } from "@shared/interfaces";
+import { getPuzzleCutSizes } from "@entities/puzzle/lib/getPuzzleCutSizes";
 import { drawPuzzleSides } from "../lib";
 
 export const generatePuzzles = createEvent();
@@ -46,7 +47,7 @@ sample({
             x: canvasPositionX,
             y: canvasPositionY,
           },
-          edges
+          sockets
         );
 
         puzzles.push(puzzle);
@@ -79,28 +80,31 @@ sample({
 
     for (let i = 0; i < puzzles.length; i++) {
       const puzzle = puzzles[i];
-      const { x, y, width, height, currentXPosition, currentYPosition, edges } =
+      const { x, y, width, height, currentXPosition, currentYPosition, sockets } =
         puzzle.getDrawInformation();
 
       const path = new Path2D();
 
-      drawPuzzleSides(path, width, height, currentXPosition, currentYPosition, edges);
+      drawPuzzleSides(path, width, height, currentXPosition, currentYPosition, sockets);
 
       context.fill();
       context.save();
 
       context.clip(path);
 
+      const { additionalWidth, additionalHeight, xDeviation, yDeviation } =
+        getPuzzleCutSizes(sockets);
+
       context.drawImage(
         image,
-        x,
-        y,
-        width,
-        height,
-        currentXPosition,
-        currentYPosition,
-        width,
-        height
+        x - xDeviation,
+        y - yDeviation,
+        width + additionalWidth,
+        height + additionalHeight,
+        currentXPosition - xDeviation,
+        currentYPosition - yDeviation,
+        width + additionalWidth,
+        height + additionalHeight
       );
 
       context.restore();
