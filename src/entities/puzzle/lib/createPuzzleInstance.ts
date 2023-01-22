@@ -15,12 +15,13 @@ export class Puzzle {
     width: number,
     height: number,
     initialCanvasPosition: Coordinates,
+    currentCanvasPosition: Coordinates,
     sockets: PuzzleSockets
   ) {
     //Important: id is order number e.x: first element has id 1, the fifth element has id 5
     this.id = id;
     this.initialCanvasPosition = initialCanvasPosition;
-    this.currentCanvasPosition = initialCanvasPosition;
+    this.currentCanvasPosition = currentCanvasPosition;
     this.puzzleClickDeviation = {
       x: 0,
       y: 0,

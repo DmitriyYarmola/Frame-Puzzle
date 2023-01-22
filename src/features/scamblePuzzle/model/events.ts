@@ -10,7 +10,8 @@ import {
   definePuzzleSockets,
 } from "@puzzleFrame/entities";
 import { Coordinates } from "@shared/interfaces";
-import { getPuzzleCutSizes } from "@entities/puzzle/lib/getPuzzleCutSizes";
+import { getPuzzleCutSizes } from "@entities/puzzle";
+import { generateRandomNumber } from "@shared/lib";
 import { drawPuzzleSides } from "../lib";
 
 export const generatePuzzles = createEvent();
@@ -24,8 +25,9 @@ sample({
   },
   filter: ({ settings: { imageInformation } }) => Boolean(imageInformation),
   fn: ({ settings: { cols, rows, imageInformation } }) => {
-    const puzzleWidth = imageInformation!.width / cols;
-    const puzzleHeight = imageInformation!.height / rows;
+    const { width, height } = imageInformation!;
+    const puzzleWidth = width / cols;
+    const puzzleHeight = height / rows;
 
     const puzzles: Puzzle[] = [];
 
@@ -36,8 +38,19 @@ sample({
         const canvasPositionY = row * puzzleHeight;
         order = order + 1;
 
-        const edges = definePuzzleEdges(order, rows * cols, cols);
-        const sockets = definePuzzleSockets(edges, order, cols, rows);
+        const sockets = definePuzzleSockets(order, cols, rows);
+
+        const randomXPosition = generateRandomNumber(0, width);
+        const randomYPosition = generateRandomNumber(0, height);
+        //TODO: Proceed the case when a puzzle has right/bottom outside socket
+        const currentPosition = {
+          x:
+            randomXPosition + puzzleWidth > width ? width - puzzleWidth : randomXPosition,
+          y:
+            randomYPosition + puzzleHeight > height
+              ? height - puzzleHeight
+              : randomYPosition,
+        };
 
         const puzzle = new Puzzle(
           order,
@@ -47,6 +60,7 @@ sample({
             x: canvasPositionX,
             y: canvasPositionY,
           },
+          currentPosition,
           sockets
         );
 

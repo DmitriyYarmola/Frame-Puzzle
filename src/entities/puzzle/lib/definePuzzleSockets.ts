@@ -1,6 +1,5 @@
-import {PuzzleEdges, PuzzleSockets} from "@entities/puzzle";
+import { definePuzzleEdges, PuzzleEdges, PuzzleSockets } from "@entities/puzzle";
 import { generateRandomNumber } from "@shared/lib";
-
 
 export const generateSideSocket = () => {
   const number = generateRandomNumber(0, 1);
@@ -15,12 +14,8 @@ const oppositeSockets = {
 
 const storedPuzzlesSockets: { [key: string]: PuzzleSockets } = {};
 
-export const definePuzzleSockets = (
-  edges: PuzzleEdges,
-  order: number,
-  cols: number,
-  rows: number
-) => {
+export const definePuzzleSockets = (order: number, cols: number, rows: number) => {
+  const edges = definePuzzleEdges(order, rows * cols, cols);
   const sockets: PuzzleSockets = [];
 
   const columnNeighbour = !edges.includes("top") ? storedPuzzlesSockets[order - 5] : null;
