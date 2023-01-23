@@ -6,4 +6,6 @@ export const $gameSettings = createStore<GameSettings>({
   cols: 5,
   rows: 5,
   imageInformation: null,
+  puzzleCurvePoint: 50,
+  puzzleSideSize: 18,
 });

@@ -3,4 +3,6 @@ export interface GameSettings {
   imageInformation: null | HTMLImageElement;
   cols: number;
   rows: number;
+  puzzleCurvePoint: number;
+  puzzleSideSize: number;
 }

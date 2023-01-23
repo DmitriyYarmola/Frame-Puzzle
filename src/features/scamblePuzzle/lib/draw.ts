@@ -1,8 +1,5 @@
 import { PuzzleSockets } from "@entities/puzzle";
 
-const CURVE_CONTROL_POINT = 50;
-const PUZZLE_SIDE_HALF = 18;
-
 const drawPuzzleSide =
   (path: Path2D) =>
   (
@@ -28,7 +25,9 @@ export const drawPuzzleSides = (
   height: number,
   currentXPosition: number,
   currentYPosition: number,
-  sockets: PuzzleSockets
+  sockets: PuzzleSockets,
+  curveControlPoint: number,
+  puzzleSideHalf: number
 ) => {
   const draw = drawPuzzleSide(path);
 
@@ -40,17 +39,17 @@ export const drawPuzzleSides = (
     const isInside = sockets[0] === "inside";
 
     draw(
-      currentXPosition + width / 2 - PUZZLE_SIDE_HALF,
+      currentXPosition + width / 2 - puzzleSideHalf,
       currentYPosition,
-      currentXPosition + width / 2 - CURVE_CONTROL_POINT,
+      currentXPosition + width / 2 - curveControlPoint,
       isInside
-        ? currentYPosition + CURVE_CONTROL_POINT
-        : currentYPosition - CURVE_CONTROL_POINT,
-      currentXPosition + width / 2 + CURVE_CONTROL_POINT,
+        ? currentYPosition + curveControlPoint
+        : currentYPosition - curveControlPoint,
+      currentXPosition + width / 2 + curveControlPoint,
       isInside
-        ? currentYPosition + CURVE_CONTROL_POINT
-        : currentYPosition - CURVE_CONTROL_POINT,
-      currentXPosition + width / 2 + PUZZLE_SIDE_HALF,
+        ? currentYPosition + curveControlPoint
+        : currentYPosition - curveControlPoint,
+      currentXPosition + width / 2 + puzzleSideHalf,
       currentYPosition,
       currentXPosition + width,
       currentYPosition
@@ -64,16 +63,16 @@ export const drawPuzzleSides = (
 
     draw(
       currentXPosition + width,
-      currentYPosition + height / 2 - PUZZLE_SIDE_HALF,
+      currentYPosition + height / 2 - puzzleSideHalf,
       isInside
-        ? currentXPosition + width - CURVE_CONTROL_POINT
-        : currentXPosition + width + CURVE_CONTROL_POINT,
-      currentYPosition + height / 2 - CURVE_CONTROL_POINT,
+        ? currentXPosition + width - curveControlPoint
+        : currentXPosition + width + curveControlPoint,
+      currentYPosition + height / 2 - curveControlPoint,
       currentXPosition +
-        (isInside ? width - CURVE_CONTROL_POINT : width + CURVE_CONTROL_POINT),
-      currentYPosition + height / 2 + CURVE_CONTROL_POINT,
+        (isInside ? width - curveControlPoint : width + curveControlPoint),
+      currentYPosition + height / 2 + curveControlPoint,
       currentXPosition + width,
-      currentYPosition + height / 2 + PUZZLE_SIDE_HALF,
+      currentYPosition + height / 2 + puzzleSideHalf,
       currentXPosition + width,
       currentYPosition + height
     );
@@ -85,16 +84,16 @@ export const drawPuzzleSides = (
     const isInside = sockets[2] === "inside";
 
     draw(
-      currentXPosition + width / 2 + PUZZLE_SIDE_HALF,
+      currentXPosition + width / 2 + puzzleSideHalf,
       currentYPosition + height,
-      currentXPosition + width / 2 + CURVE_CONTROL_POINT,
+      currentXPosition + width / 2 + curveControlPoint,
       currentYPosition +
-        (isInside ? height - CURVE_CONTROL_POINT : height + CURVE_CONTROL_POINT),
-      currentXPosition + width / 2 - CURVE_CONTROL_POINT,
+        (isInside ? height - curveControlPoint : height + curveControlPoint),
+      currentXPosition + width / 2 - curveControlPoint,
       isInside
-        ? currentYPosition + height - CURVE_CONTROL_POINT
-        : currentYPosition + height + CURVE_CONTROL_POINT,
-      currentXPosition + width / 2 - PUZZLE_SIDE_HALF,
+        ? currentYPosition + height - curveControlPoint
+        : currentYPosition + height + curveControlPoint,
+      currentXPosition + width / 2 - puzzleSideHalf,
       currentYPosition + height,
       currentXPosition,
       currentYPosition + height
@@ -108,17 +107,17 @@ export const drawPuzzleSides = (
 
     draw(
       currentXPosition,
-      currentYPosition + height / 2 + PUZZLE_SIDE_HALF,
+      currentYPosition + height / 2 + puzzleSideHalf,
       isInside
-        ? currentXPosition + CURVE_CONTROL_POINT
-        : currentXPosition - CURVE_CONTROL_POINT,
-      currentYPosition + height / 2 + CURVE_CONTROL_POINT,
+        ? currentXPosition + curveControlPoint
+        : currentXPosition - curveControlPoint,
+      currentYPosition + height / 2 + curveControlPoint,
       isInside
-        ? currentXPosition + CURVE_CONTROL_POINT
-        : currentXPosition - CURVE_CONTROL_POINT,
-      currentYPosition + height / 2 - CURVE_CONTROL_POINT,
+        ? currentXPosition + curveControlPoint
+        : currentXPosition - curveControlPoint,
+      currentYPosition + height / 2 - curveControlPoint,
       currentXPosition,
-      currentYPosition + height / 2 - PUZZLE_SIDE_HALF,
+      currentYPosition + height / 2 - puzzleSideHalf,
       currentXPosition,
       currentYPosition
     );

@@ -9,6 +9,9 @@ export class Puzzle {
   private currentCanvasPosition: Coordinates;
   private puzzleClickDeviation: Coordinates;
   private readonly sockets: PuzzleSockets;
+  private readonly verticalAvailableSockets: PuzzleSockets;
+  private readonly horizontalAvailableSockets: PuzzleSockets;
+  isSolved: boolean;
 
   constructor(
     id: number,
@@ -29,6 +32,9 @@ export class Puzzle {
     this.width = width;
     this.height = height;
     this.sockets = sockets;
+    this.verticalAvailableSockets = [sockets[0], sockets[2]].filter((socket) => socket);
+    this.horizontalAvailableSockets = [sockets[1], sockets[3]].filter((socket) => socket);
+    this.isSolved = false;
   }
 
   getDrawInformation() {
@@ -43,6 +49,8 @@ export class Puzzle {
       currentXPosition,
       currentYPosition,
       sockets: this.sockets,
+      verticalSockets: this.verticalAvailableSockets,
+      horizontalSockets: this.horizontalAvailableSockets,
     };
   }
 
@@ -67,6 +75,13 @@ export class Puzzle {
     };
   }
 
+  getInitialCoordinates() {
+    return {
+      x: this.initialCanvasPosition.x,
+      y: this.initialCanvasPosition.y,
+    };
+  }
+
   setPuzzleClickDeviation(x: number, y: number) {
     this.puzzleClickDeviation = {
       x: Math.abs(this.currentCanvasPosition.x - x),
@@ -74,10 +89,18 @@ export class Puzzle {
     };
   }
 
+  setIsSolved(value: boolean) {
+    this.isSolved = value;
+  }
+
   resetPuzzleClickDeviation() {
     this.puzzleClickDeviation = {
       x: 0,
       y: 0,
     };
+  }
+
+  replaceCurrentWithInitialCoordinates() {
+    this.currentCanvasPosition = this.initialCanvasPosition;
   }
 }

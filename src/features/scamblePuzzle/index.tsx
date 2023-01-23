@@ -1,8 +1,8 @@
 import React, { MouseEvent, useCallback, useEffect } from "react";
 import { useStore } from "effector-react";
-import { gameSettingsModel, canvasModel } from "@puzzleFrame/entities";
+import { gameSettingsModel, canvasModel, audioModel } from "@puzzleFrame/entities";
 import { MouseEventsTypes } from "@shared/interfaces";
-import { generatePuzzles, onGrabPuzzle, onMovePuzzle, onDropPuzzle } from "./model";
+import { onGrabPuzzle, onMovePuzzle, onDropPuzzle, createBoard } from "./model";
 
 export const ScramblePuzzle = () => {
   const canvas = useStore(canvasModel.$canvas);
@@ -16,7 +16,7 @@ export const ScramblePuzzle = () => {
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         gameSettingsModel.saveGameSettings({ imageInformation: img });
-        generatePuzzles();
+        createBoard();
       };
 
       img.src = puzzleImageBackgroundURL.image;
@@ -35,12 +35,17 @@ export const ScramblePuzzle = () => {
   );
 
   return (
-    <canvas
-      className="mx-auto active:cursor-pointer"
-      ref={(ref) => canvasModel.canvasAPI.set(ref)}
-      onMouseDown={onMouseEvent("down")}
-      onMouseMove={onMouseEvent("move")}
-      onMouseUp={onMouseEvent("up")}
-    />
+    <>
+      <canvas
+        className="mx-auto active:cursor-pointer"
+        ref={(ref) => canvasModel.canvasAPI.set(ref)}
+        onMouseDown={onMouseEvent("down")}
+        onMouseMove={onMouseEvent("move")}
+        onMouseUp={onMouseEvent("up")}
+      />
+      <audio ref={(ref) => audioModel.audioAPI.set(ref)}>
+        <source src="../src/shared/assets/clap-sound.mp3" type="audio/mpeg" />
+      </audio>
+    </>
   );
 };

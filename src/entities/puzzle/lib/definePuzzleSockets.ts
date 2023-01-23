@@ -1,5 +1,33 @@
-import { definePuzzleEdges, PuzzleEdges, PuzzleSockets } from "@entities/puzzle";
+import { PuzzleEdges, PuzzleSockets } from "@entities/puzzle";
 import { generateRandomNumber } from "@shared/lib";
+
+export const definePuzzleEdges = (order: number, totalPuzzles: number, cols: number) => {
+  const puzzlePositionToSide = Math.ceil(order / 5) * 5 - order + 1;
+
+  const edges: PuzzleEdges = [];
+
+  if (order <= cols) {
+    edges.push("top");
+  }
+
+  if (puzzlePositionToSide === 1) {
+    edges.push("right");
+  }
+
+  if (order > totalPuzzles - cols) {
+    edges.push("bottom");
+  }
+
+  if (puzzlePositionToSide === cols) {
+    edges.push("left");
+  }
+
+  if (edges.length === 0) {
+    edges.push("center");
+  }
+
+  return edges;
+};
 
 export const generateSideSocket = () => {
   const number = generateRandomNumber(0, 1);

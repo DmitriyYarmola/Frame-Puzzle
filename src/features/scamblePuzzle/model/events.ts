@@ -1,4 +1,4 @@
-import { createEvent, forward, sample } from "effector";
+import { createEvent, forward, sample, split } from "effector";
 import {
   canvasModel,
   transformCanvasCoordinatesToRelativeCoordinates,
@@ -6,20 +6,28 @@ import {
   Puzzle,
   puzzleModel,
   findPuzzleByCoordinates,
-  definePuzzleEdges,
   definePuzzleSockets,
+  checkIfPuzzleIsInRightPosition,
+  audioModel,
 } from "@puzzleFrame/entities";
 import { Coordinates } from "@shared/interfaces";
 import { getPuzzleCutSizes } from "@entities/puzzle";
 import { generateRandomNumber } from "@shared/lib";
 import { drawPuzzleSides } from "../lib";
+import { $solvedPuzzlesCount, solverPuzzlesAPI } from "./store";
 
-export const generatePuzzles = createEvent();
+export const createBoard = createEvent();
 
 export const redrawPuzzles = createEvent();
 
+export const onDropPuzzle = createEvent();
+
+export const refreshBoard = createEvent();
+
+export const onMovePuzzle = createEvent<Coordinates>();
+
 sample({
-  clock: generatePuzzles,
+  clock: createBoard,
   source: {
     settings: gameSettingsModel.$gameSettings,
   },
@@ -42,7 +50,7 @@ sample({
 
         const randomXPosition = generateRandomNumber(0, width);
         const randomYPosition = generateRandomNumber(0, height);
-        //TODO: Proceed the case when a puzzle has right/bottom outside socket
+        //TODO: Proceed the case when a puzzle has right/bottom outside a socket
         const currentPosition = {
           x:
             randomXPosition + puzzleWidth > width ? width - puzzleWidth : randomXPosition,
@@ -85,7 +93,11 @@ sample({
     puzzles: puzzleModel.$puzzles,
     settings: gameSettingsModel.$gameSettings,
   },
-  fn: ({ canvas, puzzles, settings: { imageInformation: image } }) => {
+  fn: ({
+    canvas,
+    puzzles,
+    settings: { imageInformation: image, puzzleCurvePoint, puzzleSideSize },
+  }) => {
     if (!canvas || !image) return null;
 
     const context = canvas.getContext("2d");
@@ -94,12 +106,30 @@ sample({
 
     for (let i = 0; i < puzzles.length; i++) {
       const puzzle = puzzles[i];
-      const { x, y, width, height, currentXPosition, currentYPosition, sockets } =
-        puzzle.getDrawInformation();
+      const {
+        x,
+        y,
+        width,
+        height,
+        currentXPosition,
+        currentYPosition,
+        sockets,
+        verticalSockets,
+        horizontalSockets,
+      } = puzzle.getDrawInformation();
 
       const path = new Path2D();
 
-      drawPuzzleSides(path, width, height, currentXPosition, currentYPosition, sockets);
+      drawPuzzleSides(
+        path,
+        width,
+        height,
+        currentXPosition,
+        currentYPosition,
+        sockets,
+        puzzleCurvePoint,
+        puzzleSideSize
+      );
 
       context.fill();
       context.save();
@@ -107,7 +137,7 @@ sample({
       context.clip(path);
 
       const { additionalWidth, additionalHeight, xDeviation, yDeviation } =
-        getPuzzleCutSizes(sockets);
+        getPuzzleCutSizes(sockets, verticalSockets, horizontalSockets);
 
       context.drawImage(
         image,
@@ -156,13 +186,15 @@ sample({
   target: puzzleModel.$selectedPuzzle,
 });
 
-export const onMovePuzzle = createEvent<Coordinates>();
-
 //Note: we must clear the canvas before redrawing puzzles
 sample({
-  clock: onMovePuzzle,
-  source: puzzleModel.$selectedPuzzle,
-  filter: (puzzle) => Boolean(puzzle),
+  clock: [onMovePuzzle, onDropPuzzle],
+  source: {
+    puzzle: puzzleModel.$selectedPuzzle,
+    canvas: canvasModel.$canvas,
+    settings: gameSettingsModel.$gameSettings,
+  },
+  filter: ({ puzzle, canvas }) => Boolean(canvas) && Boolean(puzzle),
   target: canvasModel.canvasAPI.clear,
 });
 
@@ -186,14 +218,69 @@ sample({
   target: redrawPuzzles,
 });
 
-export const onDropPuzzle = createEvent();
+const puzzlePlacedSuccess = createEvent();
+const puzzlePlacedFail = createEvent();
+
+split({
+  source: sample({
+    clock: onDropPuzzle,
+    source: { puzzle: puzzleModel.$selectedPuzzle },
+    filter: ({ puzzle }) => Boolean(puzzle),
+    fn: ({ puzzle }) => {
+      const isCorrectlyPlaced = checkIfPuzzleIsInRightPosition(puzzle!);
+
+      puzzle!.resetPuzzleClickDeviation();
+
+      return {
+        isCorrect: isCorrectlyPlaced,
+        previouslyCorrect: puzzle!.isSolved,
+      };
+    },
+  }),
+  match: {
+    correct: ({ isCorrect }) => isCorrect,
+    incorrect: ({ isCorrect, previouslyCorrect }) => previouslyCorrect && !isCorrect,
+    neutral: ({ isCorrect, previouslyCorrect }) => !previouslyCorrect && !isCorrect,
+  },
+  cases: {
+    correct: puzzlePlacedSuccess,
+    incorrect: puzzlePlacedFail,
+    neutral: refreshBoard,
+  },
+});
 
 sample({
-  clock: onDropPuzzle,
+  clock: puzzlePlacedFail,
   source: { puzzle: puzzleModel.$selectedPuzzle },
-  filter: ({ puzzle }) => Boolean(puzzle),
   fn: ({ puzzle }) => {
-    puzzle!.resetPuzzleClickDeviation();
+    if (puzzle!.isSolved) {
+      puzzle!.setIsSolved(false);
+    }
   },
-  target: puzzleModel.resetPuzzle,
+  target: [solverPuzzlesAPI.decrement, refreshBoard],
+});
+
+sample({
+  clock: puzzlePlacedSuccess,
+  source: { puzzle: puzzleModel.$selectedPuzzle },
+  fn: ({ puzzle }) => {
+    puzzle!.setIsSolved(true);
+    puzzle!.replaceCurrentWithInitialCoordinates();
+  },
+  target: [audioModel.audioAPI.play, solverPuzzlesAPI.increment, refreshBoard],
+});
+
+forward({
+  from: refreshBoard,
+  to: [redrawPuzzles, puzzleModel.resetPuzzle],
+});
+
+sample({
+  clock: $solvedPuzzlesCount,
+  source: { puzzles: puzzleModel.$puzzles },
+  filter: ({ puzzles }, solvedCount) =>
+    puzzles.length !== 0 && puzzles.length === solvedCount,
+  fn: () => {
+    console.log("CONGRATULATIONS. THE GAME HAS BEEN COMPLETED!");
+  },
 });
