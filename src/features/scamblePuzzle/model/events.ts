@@ -118,6 +118,7 @@ sample({
         horizontalSockets,
       } = puzzle.getDrawInformation();
 
+      puzzle.currentIndex = i;
       const path = new Path2D();
 
       drawPuzzleSides(
@@ -227,12 +228,10 @@ split({
     source: { puzzle: puzzleModel.$selectedPuzzle },
     filter: ({ puzzle }) => Boolean(puzzle),
     fn: ({ puzzle }) => {
-      const isCorrectlyPlaced = checkIfPuzzleIsInRightPosition(puzzle!);
-
       puzzle!.resetPuzzleClickDeviation();
 
       return {
-        isCorrect: isCorrectlyPlaced,
+        isCorrect: checkIfPuzzleIsInRightPosition(puzzle!),
         previouslyCorrect: puzzle!.isSolved,
       };
     },
@@ -262,17 +261,18 @@ sample({
 
 sample({
   clock: puzzlePlacedSuccess,
-  source: { puzzle: puzzleModel.$selectedPuzzle },
-  fn: ({ puzzle }) => {
+  source: { puzzle: puzzleModel.$selectedPuzzle, puzzles: puzzleModel.$puzzles },
+  fn: ({ puzzle, puzzles }) => {
     puzzle!.setIsSolved(true);
     puzzle!.replaceCurrentWithInitialCoordinates();
+
+    if (!puzzle) return null;
+
+    const cutPuzzle = puzzles.splice(puzzle.currentIndex, 1)[0];
+
+    puzzles.unshift(cutPuzzle);
   },
   target: [audioModel.audioAPI.play, solverPuzzlesAPI.increment, refreshBoard],
-});
-
-forward({
-  from: refreshBoard,
-  to: [redrawPuzzles, puzzleModel.resetPuzzle],
 });
 
 sample({
@@ -283,4 +283,9 @@ sample({
   fn: () => {
     console.log("CONGRATULATIONS. THE GAME HAS BEEN COMPLETED!");
   },
+});
+
+forward({
+  from: refreshBoard,
+  to: [redrawPuzzles, puzzleModel.resetPuzzle],
 });

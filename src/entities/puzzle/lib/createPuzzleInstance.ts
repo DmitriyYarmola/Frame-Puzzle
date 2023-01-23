@@ -12,6 +12,7 @@ export class Puzzle {
   private readonly verticalAvailableSockets: PuzzleSockets;
   private readonly horizontalAvailableSockets: PuzzleSockets;
   isSolved: boolean;
+  currentIndex: number;
 
   constructor(
     id: number,
@@ -35,6 +36,7 @@ export class Puzzle {
     this.verticalAvailableSockets = [sockets[0], sockets[2]].filter((socket) => socket);
     this.horizontalAvailableSockets = [sockets[1], sockets[3]].filter((socket) => socket);
     this.isSolved = false;
+    this.currentIndex = id;
   }
 
   getDrawInformation() {
@@ -102,5 +104,9 @@ export class Puzzle {
 
   replaceCurrentWithInitialCoordinates() {
     this.currentCanvasPosition = this.initialCanvasPosition;
+  }
+
+  setCurrentIndex(index: number) {
+    this.currentIndex = index;
   }
 }
